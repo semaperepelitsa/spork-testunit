@@ -5,7 +5,13 @@ class Spork::TestFramework::TestUnit < Spork::TestFramework
   def run_tests(argv, stderr, stdout)
     if defined? MiniTest
       # Ruby 1.9
-      MiniTest::Unit.output = stdout
+      io_class = MiniTest::Unit.output.class
+      if defined?(PrideIO) and io_class == PrideIO or defined?(PrideLOL) and io_class == PrideLOL
+        # Respect minitest/pride
+        MiniTest::Unit.output = io_class.new(stdout)
+      else
+        MiniTest::Unit.output = stdout
+      end
 
       # MiniTest's test/unit does not support -I
       # Extract it and remove from arguments that are passed to testrb.
